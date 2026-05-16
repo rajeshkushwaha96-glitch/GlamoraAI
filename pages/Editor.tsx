@@ -265,11 +265,11 @@ const Editor: React.FC = () => {
   const handleProcess = async () => {
     if (!originalImage) return;
 
-    if (usageLeft === 0 && !isPremium) {
-      alert("Daily limit reached! Upgrade to Premium 🚀");
-      window.location.href = "/#/pricing";
-      return;
-    }
+    if (false) {
+  alert("Daily limit reached! Upgrade to Premium 🚀");
+  window.location.href = "/#/pricing";
+  return;
+}
 
     setIsProcessing(true);
     setProcessedImage(null);
