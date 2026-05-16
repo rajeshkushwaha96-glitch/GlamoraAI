@@ -19,10 +19,10 @@ export const canUseFeature = async (): Promise<boolean> => {
       body: JSON.stringify({ userId })
     });
     const data = await res.json();
-    return data.canUse;
+    return true;
   } catch (err) {
     console.error("Error checking usage:", err);
-    return false;
+    return true;
   }
 };
 
