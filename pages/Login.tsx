@@ -9,12 +9,12 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const user = users.find((u: any) => u.email === email && u.password === password);
     if (user) {
-      login(user.email, user.isPremium, user.userId);
+      await login(user.email, user.isPremium, user.userId);
       navigate('/');
     } else {
       alert('Invalid email or password');

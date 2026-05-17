@@ -1,33 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Wand2, Zap, Crown, LogOut } from 'lucide-react';
-import { useUser } from '../contexts/UserContext';
-import { UserPlan } from '../types';
-import { checkUserPremium } from '../src/lib/premium';
 import { useAuth } from '../contexts/AuthContext';
+import { useUser } from '../contexts/UserContext';
 import { getUsageLeft } from '../src/lib/usage';
+import { checkUserPremium } from '../src/lib/premium';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [usageLeft, setUsageLeft] = useState(5);
   const [isPremium, setIsPremium] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useUser();
-  const { isAuthenticated, user: authUser, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
+  const { user: authUser, usageLeft: credits, upgradeToPremium } = useUser();
 
   useEffect(() => {
-    const updateStatus = async () => {
-      const premium = checkUserPremium();
-      setIsPremium(premium);
-      const left = await getUsageLeft();
-      setUsageLeft(left);
-    };
-
-    updateStatus();
-    const interval = setInterval(updateStatus, 2000);
-    return () => clearInterval(interval);
-  }, [isAuthenticated]);
+    setIsPremium(checkUserPremium());
+  }, [isAuthenticated, authUser?.isPremium]);
 
   const isActive = (path: string) => location.pathname === path ? 'text-indigo-600 font-semibold' : 'text-slate-600 hover:text-indigo-600';
 
@@ -63,7 +52,7 @@ const Navbar: React.FC = () => {
                       ? 'bg-amber-100 text-amber-700' 
                       : 'bg-slate-200 text-slate-600'
                   }`}>
-                    {isPremium ? '💎 PREMIUM' : `FREE • ${usageLeft} / 5`}
+                    {isPremium ? '💎 PREMIUM' : `CREDITS • ${credits}`}
                   </div>
                   <span className="text-sm text-slate-600">{authUser?.email}</span>
                   <button onClick={handleLogout} className="text-slate-600 hover:text-red-600 flex items-center gap-1">
@@ -96,15 +85,15 @@ const Navbar: React.FC = () => {
       {isOpen && (
         <div className="md:hidden bg-white border-t border-slate-100">
           <div className="px-4 pt-2 pb-6 space-y-1 shadow-lg">
-            {user && (
+            {authUser && (
               <div className="flex items-center justify-between p-4 mb-4 bg-slate-50 rounded-2xl border border-slate-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
-                    {user.name[0]}
+                    {authUser.email[0].toUpperCase()}
                   </div>
                   <div>
-                    <div className="text-sm font-bold text-slate-900">{user.name}</div>
-                    <div className="text-[10px] font-medium text-slate-500">{user.email}</div>
+                    <div className="text-sm font-bold text-slate-900">{authUser.email.split('@')[0]}</div>
+                    <div className="text-[10px] font-medium text-slate-500">{authUser.email}</div>
                   </div>
                 </div>
                 <div className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
@@ -112,7 +101,7 @@ const Navbar: React.FC = () => {
                     ? 'bg-amber-100 text-amber-700' 
                     : 'bg-slate-200 text-slate-600'
                 }`}>
-                  {isPremium ? '💎 PREMIUM' : `FREE • ${usageLeft} / 5`}
+                  {isPremium ? '💎 PREMIUM' : `CREDITS • ${credits}`}
                 </div>
               </div>
             )}

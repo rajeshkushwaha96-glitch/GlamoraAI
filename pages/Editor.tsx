@@ -16,7 +16,7 @@ const Editor: React.FC = () => {
   const { toolId } = useParams<{ toolId: string }>();
   const navigate = useNavigate();
   const tool = TOOLS.find(t => t.id === toolId);
-  const { user, upgradeToPremium, incrementEditCount } = useUser();
+  const { user, upgradeToPremium, usageLeft, incrementEditCount } = useUser();
   const isPremium = getPremiumStatus();
   const isFreeUser = !isPremium;
 
@@ -27,15 +27,7 @@ const Editor: React.FC = () => {
   const [customPrompt, setCustomPrompt] = useState('');
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
-  const [usageLeft, setUsageLeft] = useState<number>(5);
 
-  useEffect(() => {
-    const fetchUsage = async () => {
-      const left = await getUsageLeft();
-      setUsageLeft(left);
-    };
-    fetchUsage();
-  }, []);
   useEffect(() => {
     let userId = localStorage.getItem("userId");
 
@@ -265,11 +257,11 @@ const Editor: React.FC = () => {
   const handleProcess = async () => {
     if (!originalImage) return;
 
-    if (false) {
-  alert("Daily limit reached! Upgrade to Premium 🚀");
-  window.location.href = "/#/pricing";
-  return;
-}
+    if (usageLeft === 0 && !isPremium) {
+      alert("Daily limit reached! Upgrade to Premium 🚀");
+      window.location.href = "/#/pricing";
+      return;
+    }
 
     setIsProcessing(true);
     setProcessedImage(null);
@@ -287,9 +279,7 @@ const Editor: React.FC = () => {
       }
 
       setProcessedImage(result);
-      await increaseUsage();
-      const left = await getUsageLeft();
-      setUsageLeft(left);
+      await incrementEditCount();
     } catch (err) {
       setError("Failed to process image. Please try again. " + (err instanceof Error ? err.message : ''));
     } finally {
@@ -849,7 +839,7 @@ const Editor: React.FC = () => {
                     fontSize: "14px",
                     color: "#555"
                   }}>
-                    Free uses left: {usageLeft} / 5
+                    Credits: {usageLeft}
                   </div>
                 )}
 

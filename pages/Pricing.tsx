@@ -4,12 +4,13 @@ import { Check, ArrowRight, Star, Crown, Globe, ShieldCheck, Zap, Clock, Sparkle
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '../contexts/UserContext';
-import { setPremiumStatus } from '../src/lib/premium';
+import { useNavigate } from 'react-router-dom';
 
 const Pricing: React.FC = () => {
+  const navigate = useNavigate();
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
-  const { user } = useUser();
+  const { user, upgradeToPremium } = useUser();
 
   const handlePayment = async (amount: number, planName: string, cycle: 'monthly' | 'yearly') => {
     if (!(window as any).Razorpay) {
@@ -56,13 +57,13 @@ const Pricing: React.FC = () => {
         order_id: data.id,
         name: "Glamora AI",
         description: `${planName} Plan`,
-        handler: function (response: any) {
+        handler: async function (response: any) {
           alert("Payment Successful 🎉");
           console.log(response);
 
-          setPremiumStatus(true);
+          await upgradeToPremium();
           localStorage.removeItem("pendingPayment");
-          window.location.reload();
+          navigate('/');
         },
         modal: {
           ondismiss: function () {

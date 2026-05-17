@@ -10,8 +10,8 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Pricing from './pages/Pricing';
 import About from './pages/About';
-import { UserProvider } from './contexts/UserContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { UserProvider } from './contexts/UserContext';
 
 // Helper for generic page layout (Navbar + Content + Footer)
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
